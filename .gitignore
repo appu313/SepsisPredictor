@@ -1,0 +1,8 @@
+# Ignore data
+data/**/*
+
+# Ignore pycache directories
+**/__pycache__/
+
+# Ignore pycache files
+*.pyc

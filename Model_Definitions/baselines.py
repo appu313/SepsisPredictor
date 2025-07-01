@@ -30,12 +30,14 @@ class Baseline_GRU(nn.Module):
       batch_first=True
     )
 
-    self.classifier = nn.Linear(hidden_size, output_size)
+    self.classifier = nn.Sequential(
+      nn.Linear(hidden_size, output_size),
+      nn.Softmax(dim=-1)
+    )
   
   def forward(self, x):
-    out_seq, _ = self.gru(input=x)
-    out = self.classifier(out_seq)
-    return out
+    _, h = self.gru(input=x)
+    return self.classifier(h[-1])
 
 
 class Baseline_LSTM(nn.Module):
@@ -66,7 +68,11 @@ class Baseline_LSTM(nn.Module):
       batch_first=True
     )
 
-    self.classifier = nn.Linear(hidden_size, output_size)
+    self.classifier = nn.Sequential(
+      nn.Linear(hidden_size, output_size),
+      nn.Softmax(dim=-1)
+    )
+    
 
   def forward(self, x):
     """
@@ -78,9 +84,7 @@ class Baseline_LSTM(nn.Module):
       L: Length of sequence
       D: Input size
     """
-    out_seq, _ = self.lstm(input=x)
-    out = self.classifier(out_seq)
-    return out
-
+    _, (h, _) = self.lstm(input=x)
+    return self.classifier(h[-1])
 
 
