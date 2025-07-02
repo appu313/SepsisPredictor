@@ -14,7 +14,7 @@ def get_batched_data(train_set, val_set, batch_size):
     val_loader = DataLoader(val_set, batch_size=batch_size, sampler=val_sampler)
     return train_loader, val_loader
 
-def train(train_set: TensorDataset, val_set: TensorDataset, model, optimizer, criterion, num_epochs, batch_size=52, val_size=0.3, positive_threshold=0.5):
+def train(train_set: TensorDataset, val_set: TensorDataset, model, optimizer, criterion, num_epochs, batch_size=52):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
     train_loader, val_loader = get_batched_data(train_set=train_set, val_set=val_set, batch_size=batch_size)
@@ -49,4 +49,3 @@ def train(train_set: TensorDataset, val_set: TensorDataset, model, optimizer, cr
                 f"Train Loss: {avg_train_loss:.4f} | "
                 f"Val Loss: {avg_val_loss:.4f} | ")
     return model, history
-
