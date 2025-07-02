@@ -12,4 +12,4 @@ Modules and owners:
 - transformer.py        --> Responsible:
 - tft.py                --> Responsible:
 """
-from .baselines import Baseline_GRU, Baseline_LSTM
+from .baselines import Baseline_GRU, Baseline_LSTM, Baseline_Model_Hyperparameter_Grid, Basline_Model_Hyperparameters

@@ -10,4 +10,5 @@ Modules and owners:
 - evaluate.py         --> Responsible: Ehsan (Implement evaluation metrics (AUROC, PRC, etc.))
 - visualize.py        --> Responsible: _____ (Logging & experiment tracking (TensorBoard))
 """
-from .train import train
+from .train import train, Train_Hyperparameter_Grid, Train_Hyperparameters
+from .tune import baseline_grid_search_tuning
