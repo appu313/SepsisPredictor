@@ -11,4 +11,4 @@ Modules and owners:
 - visualize.py        --> Responsible: _____ (Logging & experiment tracking (TensorBoard))
 """
 from .train import train, Train_Hyperparameter_Grid, Train_Hyperparameters
-from .tune import baseline_grid_search_tuning
+from .tune import grid_search_tune, Hyperparameter_Grid
