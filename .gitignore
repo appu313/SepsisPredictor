@@ -1,5 +1,6 @@
 # Ignore data
-data/**/*
+*.csv
+data/preprocessed/**/*
 
 # Ignore pycache directories
 **/__pycache__/
