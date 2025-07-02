@@ -7,3 +7,4 @@ data/preprocessed/**/*
 
 # Ignore pycache files
 *.pyc
+*.DS_Store
