@@ -36,8 +36,13 @@ def get_batched_data(train_set, val_set, batch_size):
     val_loader = DataLoader(val_set, batch_size=batch_size, sampler=val_sampler)
     return train_loader, val_loader
 
-def train(train_set: TensorDataset, val_set: TensorDataset, model, criterion, hyperparameters: Train_Hyperparameters, quiet=False):
-  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+def train(train_set: TensorDataset, val_set: TensorDataset, model, criterion, hyperparameters: Train_Hyperparameters, quiet=False, gpu_id=None):
+  device = None
+  if gpu_id is None:
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+  else:
+    device = torch.device(f'cuda:{gpu_id}' if torch.cuda.is_available() else "cpu")
+  
   optimizer = torch.optim.Adam(model.parameters(), hyperparameters.learning_rate)
   model.to(device)
   train_loader, val_loader = get_batched_data(train_set=train_set, val_set=val_set, batch_size=hyperparameters.batch_size)
@@ -46,7 +51,7 @@ def train(train_set: TensorDataset, val_set: TensorDataset, model, criterion, hy
   for epoch in range(hyperparameters.num_epochs):
     model.train()
     train_loss = 0.0
-    for batch_x, batch_y in tqdm(train_loader):
+    for batch_x, batch_y in tqdm(train_loader, disable=quiet):
       inputs, targets = batch_x.to(device), batch_y.type(torch.LongTensor).to(device)
       optimizer.zero_grad()
       outputs = model(inputs)
