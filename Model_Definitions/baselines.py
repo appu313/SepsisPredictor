@@ -16,7 +16,7 @@ class Baseline_Model_Hyperparameter_Grid:
   def get_flattened_grid(self) -> list[Basline_Model_Hyperparameters]:
     flat_grid = []
     for h in self.hidden_size_grid:
-      for l in self.num_layers_range:
+      for l in self.num_layers_grid:
         flat_grid.append(Basline_Model_Hyperparameters(hidden_size=h, num_layers=l))
     return flat_grid
 

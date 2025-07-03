@@ -8,3 +8,6 @@ data/preprocessed/**/*
 # Ignore pycache files
 *.pyc
 *.DS_Store
+
+# Ignore ibynb checkpoints
+.ipynb_checkpoints/**/*
