@@ -1,0 +1,10 @@
+# Ignore data
+*.csv
+data/preprocessed/**/*
+
+# Ignore pycache directories
+**/__pycache__/
+
+# Ignore pycache files
+*.pyc
+*.DS_Store
