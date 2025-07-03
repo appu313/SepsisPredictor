@@ -11,5 +11,10 @@ Modules and owners:
 - evaluate.py         --> Responsible: _____ (Implement evaluation metrics (AUROC, PRC, etc.))
 - visualize.py        --> Responsible: _____ (Logging & experiment tracking (TensorBoard))
 """
-from .train import train, Train_Hyperparameter_Grid, Train_Hyperparameters
+from .train import(
+    train_validate,
+    train_for_evaluation, 
+    Train_Hyperparameter_Grid, 
+    Train_Hyperparameters
+)
 from .tune import grid_search_tune, grid_search_tune_parallel, Hyperparameter_Grid
