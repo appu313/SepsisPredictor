@@ -36,7 +36,7 @@ def get_batched_data(train_set, val_set, batch_size):
     val_loader = DataLoader(val_set, batch_size=batch_size, sampler=val_sampler)
     return train_loader, val_loader
 
-def train(train_set: TensorDataset, val_set: TensorDataset, model, criterion, hyperparameters: Train_Hyperparameters, quiet=False, gpu_id=None):
+def train_validate(train_set: TensorDataset, val_set: TensorDataset, model, criterion, hyperparameters: Train_Hyperparameters, quiet=False, gpu_id=None):
   device = None
   if gpu_id is None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -77,4 +77,37 @@ def train(train_set: TensorDataset, val_set: TensorDataset, model, criterion, hy
       print(f"Epoch {epoch+1}/{hyperparameters.num_epochs} | "
             f"Train Loss: {avg_train_loss:.4f} | "
             f"Val Loss: {avg_val_loss:.4f} | ")
+  return model, history
+
+
+def train_for_evaluation(train_set: TensorDataset, model, criterion, hyperparameters: Train_Hyperparameters, quiet=False, gpu_id=None):
+  device = None
+  if gpu_id is None:
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+  else:
+    device = torch.device(f'cuda:{gpu_id}' if torch.cuda.is_available() else "cpu")
+  
+  optimizer = torch.optim.Adam(model.parameters(), hyperparameters.learning_rate)
+  model.to(device)
+  train_loader, val_loader = get_batched_data(train_set=train_set, val_set=val_set, batch_size=hyperparameters.batch_size)
+  history = {'train_loss': [], 'val_loss': [], 'val_acc': []}
+  
+  for epoch in range(hyperparameters.num_epochs):
+    model.train()
+    train_loss = 0.0
+    for batch_x, batch_y in tqdm(train_loader, disable=quiet):
+      inputs, targets = batch_x.to(device), batch_y.type(torch.LongTensor).to(device)
+      optimizer.zero_grad()
+      outputs = model(inputs)
+      loss = criterion(outputs.squeeze(), targets)
+      loss.backward()
+      optimizer.step()
+      train_loss += loss.item()
+    
+    avg_train_loss = train_loss / len(train_loader)
+    history['train_loss'].append(avg_train_loss)
+    
+    if not quiet:
+      print(f"Epoch {epoch+1}/{hyperparameters.num_epochs} | "
+            f"Train Loss: {avg_train_loss:.4f}")
   return model, history

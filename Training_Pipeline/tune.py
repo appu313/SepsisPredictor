@@ -4,7 +4,7 @@ import torch.multiprocessing as mp
 import numpy as np
 from pathlib import Path
 from tqdm.notebook import tqdm
-from Training_Pipeline import train, Train_Hyperparameter_Grid
+from Training_Pipeline import train_validate, Train_Hyperparameter_Grid
 from torch.utils.data import TensorDataset
 from Model_Definitions import (
   Baseline_GRU,
@@ -30,7 +30,7 @@ def grid_search_tune_worker(args):
   train_set, val_set, train_params, model_params, input_size, output_size, model_type, loss_function, gpu_id, queue = args
   model = model_type(input_size=input_size, output_size=output_size, hyperparameters=model_params)
   criterion = loss_function()
-  model, history = train(
+  model, history = train_validate(
     train_set=train_set, 
     val_set=val_set, 
     model=model, 
@@ -150,7 +150,7 @@ def grid_search_tune(data_fold_path: Path, hyperparameter_grid: Hyperparameter_G
       val_set: TensorDataset = joblib.load(val_path)
       model = model_type(input_size=input_size, output_size=output_size, hyperparameters=model_params)
       criterion = loss_function()
-      model, history = train(
+      model, history = train_validate(
         train_set=train_set, 
         val_set=val_set, 
         model=model, 
