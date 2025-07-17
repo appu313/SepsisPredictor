@@ -1,4 +1,6 @@
+import gc
 import torch
+import joblib
 from torch.utils.data import(
     TensorDataset,
     DataLoader,
@@ -6,6 +8,23 @@ from torch.utils.data import(
 )
 
 from tqdm.notebook import tqdm
+
+class Train_Val_Task:
+  def __init__(self, train_set, val_set, train_params, model_params, input_size, output_size, model_type, loss_function, pipe, id):
+    self.train_set = train_set
+    self.val_set = val_set
+    self.train_params = train_params
+    self.model_params = model_params
+    self.input_size = input_size
+    self.output_size = output_size,
+    self.model_type = model_type,
+    self.loss_function = loss_function
+    self.pipe = pipe
+    self.id = id
+  
+  def post_result(self, result):
+    self.pipe.send(result)
+    self.pipe.close()
 
 class Train_Hyperparameters:
   def __init__(self, batch_size, num_epochs, learning_rate):
@@ -80,12 +99,57 @@ def train_validate(train_set: TensorDataset, val_set: TensorDataset, model, crit
   return model, history
 
 
-def train_for_evaluation(train_set: TensorDataset, model, criterion, hyperparameters: Train_Hyperparameters, quiet=False, gpu_id=None):
+def process_train_task(task: Train_Val_Task, gpu_id) -> None:
   device = None
   if gpu_id is None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
   else:
     device = torch.device(f'cuda:{gpu_id}' if torch.cuda.is_available() else "cpu")
+  
+  model = task.model_type(input_size=task.input_size, output_size=task.output_size, hyperparameters=task.model_params)
+  model.to(device)
+  
+  hyperparameters = task.train_params
+  optimizer = torch.optim.Adam(model.parameters(), hyperparameters.learning_rate)
+  criterion = task.loss_function()
+  
+  train_set = joblib.load(task.train_set)
+  val_set = joblib.load(task.val_set)
+  train_loader, val_loader = get_batched_data(train_set=train_set, val_set=val_set, batch_size=hyperparameters.batch_size)
+  history = []
+  
+  for _ in range(hyperparameters.num_epochs):
+    model.train()
+    for batch_x, batch_y in train_loader:
+      inputs, targets = batch_x.to(device), batch_y.type(torch.LongTensor).to(device)
+      optimizer.zero_grad()
+      outputs = model(inputs)
+      loss = criterion(outputs.squeeze(), targets)
+      loss.backward()
+      optimizer.step()
+
+    model.eval()
+    with torch.no_grad():
+      val_loss = 0.0
+      for val_x, val_y in val_loader:
+        inputs, targets = val_x.to(device), val_y.type(torch.LongTensor).to(device)
+        outputs = model(inputs)
+        val_loss += criterion(outputs.squeeze(), targets).item()
+    
+    avg_val_loss = val_loss / len(val_loader)
+    history.append(avg_val_loss)
+  
+  task.post_result(history[-1])
+  del model, train_set, val_set, train_loader, val_loader
+  gc.collect()
+
+
+def train_for_evaluation(train_set: TensorDataset, model, criterion, hyperparameters: Train_Hyperparameters, quiet=False, gpu_id=None):
+  device = None
+  if gpu_id is None:
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+  else:
+    device = torch.device(f'cuda:{gpu_id}' if torch.cuda.is_available() else 'cpu')
   
   optimizer = torch.optim.Adam(model.parameters(), hyperparameters.learning_rate)
   model.to(device)

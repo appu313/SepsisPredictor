@@ -14,7 +14,9 @@ Modules and owners:
 from .train import(
     train_validate,
     train_for_evaluation, 
+    process_train_task,
     Train_Hyperparameter_Grid, 
-    Train_Hyperparameters
+    Train_Hyperparameters,
+    Train_Val_Task
 )
 from .tune import grid_search_tune, grid_search_tune_parallel, Hyperparameter_Grid
