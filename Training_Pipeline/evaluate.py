@@ -41,9 +41,8 @@ def roc_eval(model, dataset: TensorDataset, batch_size=32, quiet=False):
             all_preds.extend(probs.cpu().numpy())
     fpr, tpr, thresholds = roc_curve(all_labels, all_preds)
     auroc = auc(fpr, tpr)
-    
 
     # maximize the Youden J statistic to ensure best class separation
     best_threshold = thresholds[np.argmax(tpr - fpr)]
-    
+
     return auroc, best_threshold, (fpr, tpr)
