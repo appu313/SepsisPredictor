@@ -14,7 +14,7 @@ class Sepsis_Predictor_Encoder_Hyperparameters:
         n_layers: int = 1,
         dropout_p: float = 0.0,
         pos_encoding_dropout_p: float = 0.0,
-        interpolation_coeff: int = 24
+        interpolation_coeff: int = 24,
     ):
         """_summary_
 
@@ -28,15 +28,17 @@ class Sepsis_Predictor_Encoder_Hyperparameters:
             pos_encoding_dropout_p (float, optional): _description_. Defaults to 0.0.
             interpolation_coeff (int, optional): _description_. Defaults to 24.
         """
-        if not (activation == 'relu' or activation == 'gelu'):
-            raise ValueError(f'Invalid activation type - {activation}: choose "relu" or "gelu"')
+        if not (activation == "relu" or activation == "gelu"):
+            raise ValueError(
+                f'Invalid activation type - {activation}: choose "relu" or "gelu"'
+            )
         self.embedding_dim = embedding_dim
         self.n_heads = n_heads
         self.feedforward_hidden_dim = feedforward_hidden_dim
         self.activation = activation
         self.dropout_p = dropout_p
         self.pos_encoding_dropout_p = pos_encoding_dropout_p
-        self.n_layers = n_layers,
+        self.n_layers = (n_layers,)
         self.interpolation_coeff = interpolation_coeff
 
 
@@ -44,6 +46,7 @@ class Sepsis_Predictor_Encoder_Hyperparameters:
 # Source: https://pytorch-tutorials-preview.netlify.app/beginner/transformer_tutorial.html
 class PositionalEncoding(nn.Module):
     """Positional encoding module"""
+
     def __init__(self, d_model: int, dropout: float = 0.1, max_len: int = 5000):
         """Initialize a positional encoding layer.
 
@@ -75,25 +78,26 @@ class PositionalEncoding(nn.Module):
 # Inspired by : https://arxiv.org/pdf/2203.14469v1
 class Dense_Interpolator(nn.Module):
     """Dense Interpolation Module
-    
+
     Implements dense interpolation algorithm from (Wang, Zhao, et al)
     """
+
     def __init__(self, interpolation_coeff):
         self.I = interpolation_coeff
-    
+
     def forward(self, x):
         _, L, _ = x.shape
-        i_idx = torch.arange(1, self.I + 1).float() # (I)
-        l_idx = torch.arange(1, L + 1).float() # (L)
-        fractional_positions = i_idx.unsqueeze(1) * l_idx.unsqueeze(0) / L # (I, L)
-        coef = (1 - torch.abs(fractional_positions - i_idx.unsqueeze(1)) / self.I) ** 2 # (I, L)
-        coef = coef.unsqueeze(0).unsqueeze(3) # (1, I, L, 1)
-        x_expanded = x.unsqueeze(1) # (N, 1, L, D)
+        i_idx = torch.arange(1, self.I + 1).float()  # (I)
+        l_idx = torch.arange(1, L + 1).float()  # (L)
+        fractional_positions = i_idx.unsqueeze(1) * l_idx.unsqueeze(0) / L  # (I, L)
+        coef = (
+            1 - torch.abs(fractional_positions - i_idx.unsqueeze(1)) / self.I
+        ) ** 2  # (I, L)
+        coef = coef.unsqueeze(0).unsqueeze(3)  # (1, I, L, 1)
+        x_expanded = x.unsqueeze(1)  # (N, 1, L, D)
         weighted = coef * x_expanded
-        z = weighted.sum(dim=2) # (N, I, D)
-        return z        
-        
-
+        z = weighted.sum(dim=2)  # (N, I, D)
+        return z
 
 
 # Inspired by : https://arxiv.org/pdf/2203.14469v1
@@ -137,16 +141,24 @@ class Sepsis_Predictor_Encoder(nn.Module):
             activation=self.activation_type,
             batch_first=True,
         )
-        self.encoder = nn.TransformerEncoder(encoder_layer=self.encoder_layer, num_layers=self.n_layers)
-        self.interpolator = Dense_Interpolator(interpolation_coeff=self.interpolation_coeff)
-        self.feedforward_classifier = nn.Sequential(
-            nn.Linear(self.interpolation_coeff * self.embedding_dim, self.embedding_dim),
-            nn.ReLU() if self.activation_type == 'relu' else nn.GELU(),
-            nn.Linear(self.embedding_dim, output_size)
+        self.encoder = nn.TransformerEncoder(
+            encoder_layer=self.encoder_layer, num_layers=self.n_layers
         )
-        self.feedforward = nn.Linear(self.interpolation_coeff * self.embedding_dim, self.embedding_dim)
+        self.interpolator = Dense_Interpolator(
+            interpolation_coeff=self.interpolation_coeff
+        )
+        self.feedforward_classifier = nn.Sequential(
+            nn.Linear(
+                self.interpolation_coeff * self.embedding_dim, self.embedding_dim
+            ),
+            nn.ReLU() if self.activation_type == "relu" else nn.GELU(),
+            nn.Linear(self.embedding_dim, output_size),
+        )
+        self.feedforward = nn.Linear(
+            self.interpolation_coeff * self.embedding_dim, self.embedding_dim
+        )
         self.classifier = nn.Linear(self.embedding_dim, output_size)
-    
+
     def forward(self, x):
         """_summary_
 
@@ -157,12 +169,7 @@ class Sepsis_Predictor_Encoder(nn.Module):
         embeddings = torch.transpose(embeddings, 1, 2)
         pos_encodings = torch.transpose(self.pos_encoding(x), 0, 1)
         pos_encoded_embeddings = embeddings + pos_encodings
-        encoder_output = self.encoder(pos_encoded_embeddings) # N, L, D
+        encoder_output = self.encoder(pos_encoded_embeddings)  # N, L, D
         dense_rep = self.interpolator(encoder_output)
         dense_rep = dense_rep.reshape(-1, self.interpolation_coeff * self.embedding_dim)
         return self.feedforward_classifier(dense_rep)
-        
-        
-        
-        
-
