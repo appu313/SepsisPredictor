@@ -39,7 +39,7 @@ class Sepsis_Predictor_Encoder_Hyperparameters:
         self.activation = activation
         self.dropout_p = dropout_p
         self.pos_encoding_dropout_p = pos_encoding_dropout_p
-        self.n_layers = (n_layers,)
+        self.n_layers = n_layers
         self.interpolation_coeff = interpolation_coeff
 
 
