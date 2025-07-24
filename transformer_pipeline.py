@@ -145,6 +145,8 @@ def main():
     
     criterion = nn.BCEWithLogitsLoss(pos_weight=torch.tensor(50))
     
+    
+    print('------ Starting Training ------')
     loss_grid, roc_grid, auroc = train_eval_transformer(model, criterion, train_ds, test_ds, train_params)
     
     epochs, train_loss, eval_loss = loss_grid
