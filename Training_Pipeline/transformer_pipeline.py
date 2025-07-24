@@ -59,7 +59,7 @@ def train_eval_transformer(
         # train
         model.train()
         total_tr = 0.0
-        for X, y in tqdm(train_loader):
+        for X, y in train_loader:
             X, y = [t.to(device) for t in (X, y)]
             optimizer.zero_grad()
             out = model(X)
