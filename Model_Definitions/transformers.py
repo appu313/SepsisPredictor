@@ -170,7 +170,7 @@ class Sepsis_Predictor_Encoder(nn.Module):
         """
         embeddings = self.embedding_conv(torch.transpose(x, 1, 2))
         embeddings = torch.transpose(embeddings, 1, 2)
-        pos_encodings = torch.transpose(self.pos_encoding(x))
+        pos_encodings = self.pos_encoding(x)
         pos_encoded_embeddings = embeddings + pos_encodings
         encoder_output = self.encoder(pos_encoded_embeddings)  # N, L, D
         dense_rep = self.interpolator(encoder_output)
