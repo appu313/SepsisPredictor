@@ -169,11 +169,8 @@ class Sepsis_Predictor_Encoder(nn.Module):
             x (Tensor): Input batch of sequences with shape (Batch Size, Seq Len, Input Dim)
         """
         embeddings = self.embedding_conv(torch.transpose(x, 1, 2))
-        print(embeddings.shape)
         embeddings = torch.transpose(embeddings, 1, 2)
-        print(embeddings.shape)
-        pos_encodings = torch.transpose(self.pos_encoding(x), 0, 1)
-        print(pos_encodings.shape)
+        pos_encodings = torch.transpose(self.pos_encoding(x))
         pos_encoded_embeddings = embeddings + pos_encodings
         encoder_output = self.encoder(pos_encoded_embeddings)  # N, L, D
         dense_rep = self.interpolator(encoder_output)
