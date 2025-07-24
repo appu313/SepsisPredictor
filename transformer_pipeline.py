@@ -26,7 +26,7 @@ class SepsisTransformerDataset(Dataset):
         data = np.load(self.files[idx])
         X = torch.from_numpy(data['X']).float()
         pid = int(os.path.basename(self.files[idx]).split('_')[1].split('.')[0])
-        y = torch.tensor(self.labels[pid][-1], dtype=torch.float32)
+        y = torch.tensor(self.labels[pid], dtype=torch.float32)
         return X, y
 
 def plot_loss_curve(epochs, train_losses, eval_losses, split_name, out_dir):
