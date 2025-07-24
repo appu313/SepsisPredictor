@@ -55,7 +55,7 @@ class PositionalEncoding(nn.Module):
             dropout (float, optional): Dropout probability. Defaults to 0.1.
             max_len (int, optional): Maximum sequence length. Defaults to 5000.
         """
-        super().__init__()
+        super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(p=dropout)
         position = torch.arange(max_len).unsqueeze(1)
         div_term = torch.exp(
@@ -83,6 +83,7 @@ class Dense_Interpolator(nn.Module):
     """
 
     def __init__(self, interpolation_coeff):
+        super(Dense_Interpolator, self).__init__()
         self.I = interpolation_coeff
 
     def forward(self, x):
@@ -117,6 +118,7 @@ class Sepsis_Predictor_Encoder(nn.Module):
             output_size (_type_): _description_
             hyperparameters (Transformer_Model_Hyperparameters): _description_
         """
+        super(Sepsis_Predictor_Encoder, self).__init__()
         self.embedding_dim = hyperparameters.embedding_dim
         self.n_heads = hyperparameters.n_heads
         self.n_layers = hyperparameters.n_layers
