@@ -72,7 +72,7 @@ class PositionalEncoding(nn.Module):
         Arguments:
             x: Tensor, shape ``[seq_len, batch_size, embedding_dim]``
         """
-        x = x + self.pe[: x.size(0)]
+        x = self.pe[: x.size(0)]
         return self.dropout(x)
 
 
