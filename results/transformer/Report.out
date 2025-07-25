@@ -1,0 +1,177 @@
+---------------------------------------
+Begin Slurm Prolog: Jul-25-2025 17:30:03
+Job ID:    2716034
+User ID:   mteunissen3
+Account:   math
+Job name:  Run Transformer Experiments
+Partition: ice-gpu
+QOS:       coc-ice
+---------------------------------------
+/home/hice1/mteunissen3/.conda/envs/project_env/lib/python3.13/site-packages/sklearn/metrics/_plot/roc_curve.py:189: UserWarning: No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+  self.ax_.legend(loc="lower right")
+
+
+
+------ Starting Training: Split A ------
+
+╔══════════════════════════════════════════╗
+║ Sepsis Predictor Encoder Hyperparameters ║
+╠══════════════════════════════════════════╣
+  Embedding Dimension       :   64
+  Feedforward Hidden Dim    :   128
+  Number of Attention Heads :   4
+  Activation Function       :   relu
+  Number of Layers          :   6
+  Dropout Probability       :   0
+  Pos. Encoding Dropout     :   0
+╚══════════════════════════════════════════╝
+╔═════════════════════════════════════════╗
+║          Train Hyperparameters          ║
+╠═════════════════════════════════════════╣
+  Batch Size       :   16
+  Number of Epochs :   10
+  Learning Rate    :   0.0001
+╚═════════════════════════════════════════╝
+
+Epoch  1 | train loss 0.2662 | val loss 0.2664 | val AUROC 0.6840
+Epoch  2 | train loss 0.2529 | val loss 0.2648 | val AUROC 0.7080
+Epoch  3 | train loss 0.2475 | val loss 0.2791 | val AUROC 0.7119
+Epoch  4 | train loss 0.2440 | val loss 0.2536 | val AUROC 0.7447
+Epoch  5 | train loss 0.2408 | val loss 0.2731 | val AUROC 0.7234
+Epoch  6 | train loss 0.2385 | val loss 0.2500 | val AUROC 0.7564
+Epoch  7 | train loss 0.2343 | val loss 0.2506 | val AUROC 0.7566
+Epoch  8 | train loss 0.2336 | val loss 0.2474 | val AUROC 0.7625
+Epoch  9 | train loss 0.2301 | val loss 0.2532 | val AUROC 0.7615
+Epoch 10 | train loss 0.2276 | val loss 0.2488 | val AUROC 0.7657
+
+╔══════════════════════════════════════════════╗
+║          Sepsis Transformer Results          ║
+╠══════════════════════════════════════════════╣
+  Best Threshold (max F1)  :   0.12710411846637726
+  F1 Score                 :   0.3200836820083682
+  Precision (at max F1)    :   0.2409448818897638
+  Recall (at max F1)       :   0.4766355140186916
+  TN (at max F1)           :   3158
+  FP (at max F1)           :   482
+  FN (at max F1)           :   168
+  TP (at max F1)           :   153
+  AUROC                    :   0.7657098353360036
+  AUPRC                    :   0.2250101886947122
+╚══════════════════════════════════════════════╝
+
+/home/hice1/mteunissen3/.conda/envs/project_env/lib/python3.13/site-packages/sklearn/metrics/_plot/roc_curve.py:189: UserWarning: No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+  self.ax_.legend(loc="lower right")
+
+
+
+------ Starting Training: Split B ------
+
+╔══════════════════════════════════════════╗
+║ Sepsis Predictor Encoder Hyperparameters ║
+╠══════════════════════════════════════════╣
+  Embedding Dimension       :   64
+  Feedforward Hidden Dim    :   128
+  Number of Attention Heads :   4
+  Activation Function       :   relu
+  Number of Layers          :   6
+  Dropout Probability       :   0
+  Pos. Encoding Dropout     :   0
+╚══════════════════════════════════════════╝
+╔═════════════════════════════════════════╗
+║          Train Hyperparameters          ║
+╠═════════════════════════════════════════╣
+  Batch Size       :   16
+  Number of Epochs :   10
+  Learning Rate    :   0.0001
+╚═════════════════════════════════════════╝
+
+Epoch  1 | train loss 0.1871 | val loss 0.1875 | val AUROC 0.6448
+Epoch  2 | train loss 0.1773 | val loss 0.1819 | val AUROC 0.6629
+Epoch  3 | train loss 0.1749 | val loss 0.1799 | val AUROC 0.6812
+Epoch  4 | train loss 0.1723 | val loss 0.1810 | val AUROC 0.6785
+Epoch  5 | train loss 0.1699 | val loss 0.1812 | val AUROC 0.6955
+Epoch  6 | train loss 0.1686 | val loss 0.1801 | val AUROC 0.6823
+Epoch  7 | train loss 0.1670 | val loss 0.1807 | val AUROC 0.6919
+Epoch  8 | train loss 0.1651 | val loss 0.1827 | val AUROC 0.6941
+Epoch  9 | train loss 0.1636 | val loss 0.1808 | val AUROC 0.6794
+Epoch 10 | train loss 0.1609 | val loss 0.1804 | val AUROC 0.7060
+
+╔══════════════════════════════════════════════╗
+║          Sepsis Transformer Results          ║
+╠══════════════════════════════════════════════╣
+  Best Threshold (max F1)  :   0.039820920675992966
+  F1 Score                 :   0.176313446126447
+  Precision (at max F1)    :   0.10520722635494155
+  Recall (at max F1)       :   0.5439560439560439
+  TN (at max F1)           :   2866
+  FP (at max F1)           :   842
+  FN (at max F1)           :   83
+  TP (at max F1)           :   99
+  AUROC                    :   0.705999502116007
+  AUPRC                    :   0.10440174941487368
+╚══════════════════════════════════════════════╝
+
+/home/hice1/mteunissen3/.conda/envs/project_env/lib/python3.13/site-packages/sklearn/metrics/_plot/roc_curve.py:189: UserWarning: No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+  self.ax_.legend(loc="lower right")
+
+
+
+------ Starting Training: Split AB ------
+
+╔══════════════════════════════════════════╗
+║ Sepsis Predictor Encoder Hyperparameters ║
+╠══════════════════════════════════════════╣
+  Embedding Dimension       :   64
+  Feedforward Hidden Dim    :   128
+  Number of Attention Heads :   4
+  Activation Function       :   relu
+  Number of Layers          :   6
+  Dropout Probability       :   0
+  Pos. Encoding Dropout     :   0
+╚══════════════════════════════════════════╝
+╔═════════════════════════════════════════╗
+║          Train Hyperparameters          ║
+╠═════════════════════════════════════════╣
+  Batch Size       :   16
+  Number of Epochs :   10
+  Learning Rate    :   0.0001
+╚═════════════════════════════════════════╝
+
+Epoch  1 | train loss 0.2244 | val loss 0.2193 | val AUROC 0.6903
+Epoch  2 | train loss 0.2144 | val loss 0.2160 | val AUROC 0.7180
+Epoch  3 | train loss 0.2106 | val loss 0.2148 | val AUROC 0.7246
+Epoch  4 | train loss 0.2081 | val loss 0.2135 | val AUROC 0.7339
+Epoch  5 | train loss 0.2072 | val loss 0.2141 | val AUROC 0.7388
+Epoch  6 | train loss 0.2051 | val loss 0.2130 | val AUROC 0.7352
+Epoch  7 | train loss 0.2039 | val loss 0.2111 | val AUROC 0.7474
+Epoch  8 | train loss 0.2017 | val loss 0.2125 | val AUROC 0.7498
+Epoch  9 | train loss 0.2002 | val loss 0.2126 | val AUROC 0.7400
+Epoch 10 | train loss 0.1976 | val loss 0.2146 | val AUROC 0.7361
+
+╔══════════════════════════════════════════════╗
+║          Sepsis Transformer Results          ║
+╠══════════════════════════════════════════════╣
+  Best Threshold (max F1)  :   0.14760573208332062
+  F1 Score                 :   0.24271844660194175
+  Precision (at max F1)    :   0.1725625539257981
+  Recall (at max F1)       :   0.40899795501022496
+  TN (at max F1)           :   6397
+  FP (at max F1)           :   959
+  FN (at max F1)           :   289
+  TP (at max F1)           :   200
+  AUROC                    :   0.7360674646463636
+  AUPRC                    :   0.15041267363176947
+╚══════════════════════════════════════════════╝
+
+---------------------------------------
+Begin Slurm Epilog: Jul-25-2025 17:41:11
+Job ID:        2716034
+User ID:       mteunissen3
+Account:       math
+Job name:      Run Transformer Experiments
+Resources:     cpu=1,gres/gpu:h100=1,mem=32G,node=1
+Rsrc Used:     cput=00:11:08,vmem=0,walltime=00:11:08,mem=39168K,energy_used=0
+Partition:     ice-gpu
+QOS:           coc-ice
+Nodes:         atl1-1-03-013-13-0
+---------------------------------------
