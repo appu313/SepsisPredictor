@@ -9,11 +9,14 @@ import matplotlib.pyplot as plt
 import argparse
 from sklearn.metrics import(
     roc_curve, 
-    precision_recall_curve, 
+    precision_recall_curve,
+    RocCurveDisplay,
+    PrecisionRecallDisplay,
     roc_auc_score, 
     average_precision_score,
     f1_score,
-    confusion_matrix
+    confusion_matrix,
+    ConfusionMatrixDisplay
 )
 from torch.utils.data import Dataset, DataLoader
 from Model_Definitions import Sepsis_Predictor_Encoder, Sepsis_Predictor_Encoder_Hyperparameters
@@ -52,7 +55,7 @@ class SepsisTransformerResult:
         label_lines = [line for line in lines[3:-1]]
         max_label_width = max(len(line.split(":")[0]) for line in label_lines)
 
-        formatted_lines = lines[:4]  # include header and note
+        formatted_lines = lines[:3]  # include header and note
 
         for line in label_lines:
             label, value = line.split(":")
@@ -85,15 +88,29 @@ def plot_loss_curve(epochs, train_losses, eval_losses, split_name, out_dir):
     plt.savefig(os.path.join(out_dir, 'loss_curve.png')); plt.close()
 
 
-def plot_roc_curve(fpr, tpr, auc, split_name, out_dir):
-    plt.figure(); plt.plot(fpr, tpr, label=f'AUC={auc:.3f}'); plt.plot([0,1],[0,1],'--')
-    plt.xlabel('FPR'); plt.ylabel('TPR'); plt.title(f'ROC ({split_name})'); plt.legend()
-    plt.savefig(os.path.join(out_dir, 'roc_curve.png')); plt.close()
+def plot_roc_and_prc_curves(roc_curve, prc_curve, split_name, out_dir):
+    fpr, tpr = roc_curve
+    prec, rec = prc_curve
+    
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 8))
+    
+    roc_display = RocCurveDisplay(fpr=fpr, tpr=tpr)
+    prc_display = PrecisionRecallDisplay(precision=prec, recall=rec)
+    roc_display.plot(ax=ax1)
+    prc_display.pllt(ax=ax2)
+    
+    fig.suptitle(f'ROC, Precision/Recall -- Split {split_name}')
+    
+    fig.savefig(os.path.join(out_dir, 'prc_roc_curve.png')); plt.close(fig)
 
-def plot_prc_curve(prec, rec, auprc, split_name, out_dir):
-    plt.figure(); plt.plot(prec, rec, label=f'AUC={auprc:.3f}')
-    plt.xlabel('Precision'); plt.ylabel('Recall'); plt.title(f'PRC ({split_name})'); plt.legend()
-    plt.savefig(os.path.join(out_dir, 'prc_curve.png')); plt.close()
+def plot_confusion_matrix(cm, split_name, out_dir):
+    fig, ax = plt.subplots(figsize=(6, 6))
+    cm_display = ConfusionMatrixDisplay(cm, display_labels=[0, 1])
+    cm_display.plot(ax)
+    fig.suptitle(f'Confusion Matrix -- Split {split_name}')
+    plt.savefig(os.path.join(out_dir, 'cmatrix.png'))
+    plt.close(fig)
+
 
 def train_eval_transformer(
     model,
@@ -237,10 +254,7 @@ def main():
     print(f'{hyperparams}\n{train_params}\n')
     
     loss_grid, roc_grid, prc_grid, best_thresh_scores, confusion_matrix, auroc, auprc = train_eval_transformer(model, criterion, train_ds, test_ds, train_params)
-    
     epochs, train_loss, eval_loss = loss_grid
-    fpr, tpr = roc_grid
-    prec, rec = prc_grid
     threshold, f1, precision, recall = best_thresh_scores
     
     res = SepsisTransformerResult(
@@ -256,8 +270,8 @@ def main():
     print(f'\n{res}\n')
     
     plot_loss_curve(epochs, train_loss, eval_loss, split_name=args.split_name, out_dir=fig_dir)
-    plot_roc_curve(fpr, tpr, auroc, args.split_name, fig_dir)
-    plot_prc_curve(prec, rec, auprc, args.split_name, fig_dir)
+    plot_roc_and_prc_curves(roc_curve=roc_grid, prc_curve=prc_grid, split_name=args.split_name, out_dir=fig_dir)
+    plot_confusion_matrix(cm=confusion_matrix, split_name=args.split_name, out_dir=fig_dir)
 
 if __name__ == '__main__':
     main()
