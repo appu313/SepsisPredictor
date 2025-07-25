@@ -123,7 +123,7 @@ def main():
         embedding_dim=48,
         feedforward_hidden_dim=64,
         n_heads=4,
-        activation='relu',
+        activation='gelu',
         n_layers=6,
         dropout_p=0,
         pos_encoding_dropout_p=0
