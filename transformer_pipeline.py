@@ -98,16 +98,16 @@ def plot_roc_and_prc_curves(roc_curve, prc_curve, split_name, out_dir):
     prc_display = PrecisionRecallDisplay(precision=prec, recall=rec)
     roc_display.plot(ax=ax1)
     prc_display.plot(ax=ax2)
-    
-    fig.suptitle(f'ROC, Precision/Recall -- Split {split_name}')
-    
+    ax1.set_title('ROC Curve')
+    ax2.set_title('Precision/Recall Curve')
+    fig.suptitle(f'Split {split_name}')
     fig.savefig(os.path.join(out_dir, 'prc_roc_curve.png')); plt.close(fig)
 
 def plot_confusion_matrix(cm, split_name, out_dir):
     fig, ax = plt.subplots(figsize=(6, 6))
     cm_display = ConfusionMatrixDisplay(cm)
     cm_display.plot(ax)
-    fig.suptitle(f'Confusion Matrix -- Split {split_name}')
+    ax.set_title(f'Confusion Matrix -- Split {split_name}')
     plt.savefig(os.path.join(out_dir, 'cmatrix.png'))
     plt.close(fig)
 
