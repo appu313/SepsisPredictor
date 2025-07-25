@@ -23,7 +23,6 @@ from .baselines import (
 from .transformers import (
     Sepsis_Predictor_Encoder,
     Sepsis_Predictor_Encoder_Hyperparameters,
-    PositionalEncoding,
-    Dense_Interpolator
+    PositionalEncoding
 )
 
