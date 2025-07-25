@@ -74,34 +74,7 @@ class PositionalEncoding(nn.Module):
         return self.dropout(x)
 
 
-# Inspired by : https://arxiv.org/pdf/2203.14469v1
-# class Dense_Interpolator(nn.Module):
-#     """Dense Interpolation Module
-
-#     Implements dense interpolation algorithm from (Wang, Zhao, et al)
-#     """
-
-#     def __init__(self, interpolation_coeff):
-#         super(Dense_Interpolator, self).__init__()
-#         self.I = interpolation_coeff
-
-#     def forward(self, x):
-#         device = x.device
-#         _, L, _ = x.shape
-#         i_idx = torch.arange(1, self.I + 1, device=device).float()  # (I)
-#         l_idx = torch.arange(1, L + 1, device=device).float()  # (L)
-#         fractional_positions = i_idx.unsqueeze(1) * l_idx.unsqueeze(0) / L  # (I, L)
-#         coef = (
-#             1 - torch.abs(fractional_positions - i_idx.unsqueeze(1)) / self.I
-#         ) ** 2  # (I, L)
-#         coef = coef.unsqueeze(0).unsqueeze(3)  # (1, I, L, 1)
-#         x_expanded = x.unsqueeze(1)  # (N, 1, L, D)
-#         weighted = coef * x_expanded
-#         z = weighted.sum(dim=2)  # (N, I, D)
-#         return z
-
-
-# Inspired by : https://arxiv.org/pdf/2203.14469v1
+# multilayer transformer encoder -> decoder layer -> binary classifier
 class Sepsis_Predictor_Encoder(nn.Module):
     """Transformer Encoder model"""
 
@@ -154,6 +127,10 @@ class Sepsis_Predictor_Encoder(nn.Module):
         
         self.encoder = nn.TransformerEncoder(
             encoder_layer=self.encoder_layer, num_layers=self.n_layers
+        )
+        
+        self.decoder == nn.TransformerDecoder(
+            decoder_layer=self.decoder_layer, num_layers=self.n_layers
         )
         
         self.classifier = nn.Linear(self.embedding_dim, output_size)

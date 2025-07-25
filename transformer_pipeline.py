@@ -123,17 +123,17 @@ def main():
     hyperparams = Sepsis_Predictor_Encoder_Hyperparameters(
         embedding_dim=128,
         feedforward_hidden_dim=256,
-        n_heads=8,
+        n_heads=4,
         activation='gelu',
-        n_layers=24,
-        dropout_p=0.1,
-        pos_encoding_dropout_p=0.1
+        n_layers=4,
+        dropout_p=0,
+        pos_encoding_dropout_p=0
     )
     
     train_params = Train_Hyperparameters(
         batch_size=32,
-        num_epochs=20,
-        learning_rate=1e-4
+        num_epochs=10,
+        learning_rate=1e-3
     )
     
     model = Sepsis_Predictor_Encoder(
