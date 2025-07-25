@@ -28,7 +28,7 @@ class SepsisTransformerResult:
         self.f1_score = f1
         self.precision = precision
         self.recall = recall
-        self.tn, self.fp, self.fn, self.tp = confusion_matrix
+        self.tn, self.fp, self.fn, self.tp = confusion_matrix.ravel()
         self.auroc = auroc
         self.auprc = auprc
 
@@ -182,16 +182,14 @@ def train_eval_transformer(
     y_pred_best = (preds >= best_threshold).astype(int)
     
     # confusion matrix
-    tn, fp, fn, tp = confusion_matrix(labels, y_pred_best).ravel()
-    
-    
+    c_matrix =  confusion_matrix(labels, y_pred_best)
     
     return (
         (epochs_range, train_losses, eval_losses), 
         (fpr, tpr), 
         (prec, rec),
         (best_threshold, best_f1, precision, recall),
-        (tn, fp, fn, tp),
+        c_matrix,
         auroc,
         auprc
     )
