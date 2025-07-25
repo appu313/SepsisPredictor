@@ -124,17 +124,17 @@ def main():
         embedding_dim=128,
         feedforward_hidden_dim=256,
         n_heads=8,
-        activation='gelu',
-        n_layers=12,
+        activation='relu',
+        n_layers=10,
         dropout_p=0.1,
         pos_encoding_dropout_p=0.1,
         interpolation_coeff=6
     )
     
     train_params = Train_Hyperparameters(
-        batch_size=32,
-        num_epochs=40,
-        learning_rate=1e-4
+        batch_size=8,
+        num_epochs=5,
+        learning_rate=5e-5
     )
     
     model = Sepsis_Predictor_Encoder(
