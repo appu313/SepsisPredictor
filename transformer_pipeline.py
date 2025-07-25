@@ -120,19 +120,19 @@ def main():
     os.makedirs(fig_dir, exist_ok=True)
     
     hyperparams = Sepsis_Predictor_Encoder_Hyperparameters(
-        embedding_dim=48,
-        feedforward_hidden_dim=64,
+        embedding_dim=64,
+        feedforward_hidden_dim=128,
         n_heads=4,
-        activation='gelu',
-        n_layers=6,
+        activation='relu',
+        n_layers=4,
         dropout_p=0,
         pos_encoding_dropout_p=0
     )
     
     train_params = Train_Hyperparameters(
         batch_size=16,
-        num_epochs=40,
-        learning_rate=5e-5
+        num_epochs=10,
+        learning_rate=1e-4
     )
     
     model = Sepsis_Predictor_Encoder(
