@@ -88,7 +88,7 @@ def train_eval_transformer(
                 f" | val loss {eval_losses[-1]:.4f} | val AUROC {auc:.4f}")
         
     # save plots
-    epochs_range = [e for e in range(1, train_params.epochs + 1)]
+    epochs_range = [e for e in range(1, train_params.num_epochs + 1)]
     fpr, tpr, _ = roc_curve(labels, preds)
     return (epochs_range, train_losses, eval_losses), (fpr, tpr), auc
 
@@ -134,7 +134,7 @@ def main():
     train_params = Train_Hyperparameters(
         batch_size=8,
         num_epochs=4,
-        learning_rate=2e-5
+        learning_rate=1e-4
     )
     
     model = Sepsis_Predictor_Encoder(
