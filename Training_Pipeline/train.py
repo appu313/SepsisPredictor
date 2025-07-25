@@ -44,13 +44,13 @@ class Train_Hyperparameters:
         
     def __str__(self):
         lines = [
-            "╔" + "═" * 37 + "╗",
-            "║        Train Hyperparameters        ║",
-            "╠" + "═" * 37 + "╣",
+            "╔" + "═" * 41 + "╗",
+            "║          Train Hyperparameters          ║",
+            "╠" + "═" * 41 + "╣",
             f"  Batch Size      : {self.batch_size}",
             f"  Number of Epochs: {self.num_epochs}",
             f"  Learning Rate   : {self.learning_rate}",
-            "╚" + "═" * 37 + "╝",
+            "╚" + "═" * 41 + "╝",
         ]
 
         max_label_width = max(len(line.split(":")[0]) for line in lines[3:-1])
