@@ -143,7 +143,7 @@ def main():
         hyperparameters=hyperparams
     )
     
-    criterion = nn.BCEWithLogitsLoss(pos_weight=torch.tensor(50))
+    criterion = nn.BCEWithLogitsLoss(pos_weight=50.0)
     
     
     print('------ Starting Training ------')
