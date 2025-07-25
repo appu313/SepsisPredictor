@@ -49,7 +49,7 @@ def train_eval_transformer(
     ):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     model = model.to(device)
-    optimizer = torch.optim.Adam(model.parameters(), train_params.learning_rate)
+    optimizer = torch.optim.AdamW(model.parameters(), train_params.learning_rate)
     
     train_loader = DataLoader(train_set, batch_size=train_params.batch_size, shuffle=True)
     eval_loader = DataLoader(eval_set, batch_size=train_params.batch_size, shuffle=False)
@@ -126,15 +126,15 @@ def main():
         n_heads=8,
         activation='relu',
         n_layers=10,
-        dropout_p=0.1,
-        pos_encoding_dropout_p=0.1,
+        dropout_p=0,
+        pos_encoding_dropout_p=0,
         interpolation_coeff=6
     )
     
     train_params = Train_Hyperparameters(
-        batch_size=8,
-        num_epochs=5,
-        learning_rate=5e-5
+        batch_size=32,
+        num_epochs=40,
+        learning_rate=1e-3
     )
     
     model = Sepsis_Predictor_Encoder(
@@ -143,7 +143,7 @@ def main():
         hyperparameters=hyperparams
     )
     
-    criterion = nn.BCEWithLogitsLoss(pos_weight=torch.tensor(50.0))
+    criterion = nn.BCEWithLogitsLoss()
     
     
     print('------ Starting Training ------')

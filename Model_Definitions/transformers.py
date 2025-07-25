@@ -128,7 +128,6 @@ class Sepsis_Predictor_Encoder(nn.Module):
         self.activation_type = hyperparameters.activation
         self.dropout_p = hyperparameters.dropout_p
         self.pos_encoding_dropout_p = hyperparameters.pos_encoding_dropout_p
-        self.interpolation_coeff = hyperparameters.interpolation_coeff
 
         # 1x1 conv to project input time series into embedding space
         self.embedding_conv = nn.Conv1d(
