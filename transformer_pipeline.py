@@ -143,8 +143,8 @@ def main():
     
     criterion = nn.BCEWithLogitsLoss()
     
-    
-    print(f'------ Starting Training: Split {args.split_name} ------')
+    print(f'\n\n')
+    print(f'------ Starting Training: Split {args.split_name} ------\n')
     
     print(f'{hyperparams}\n{train_params}')
     
