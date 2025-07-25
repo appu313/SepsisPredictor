@@ -131,7 +131,7 @@ def main():
     
     train_params = Train_Hyperparameters(
         batch_size=16,
-        num_epochs=30,
+        num_epochs=40,
         learning_rate=5e-5
     )
     
@@ -144,7 +144,10 @@ def main():
     criterion = nn.BCEWithLogitsLoss()
     
     
-    print('------ Starting Training ------')
+    print(f'------ Starting Training: Split {args.split_name} ------')
+    
+    print(f'{hyperparams}\n{train_params}')
+    
     loss_grid, roc_grid, auroc = train_eval_transformer(model, criterion, train_ds, test_ds, train_params)
     
     epochs, train_loss, eval_loss = loss_grid

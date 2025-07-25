@@ -39,6 +39,37 @@ class Sepsis_Predictor_Encoder_Hyperparameters:
         self.dropout_p = dropout_p
         self.pos_encoding_dropout_p = pos_encoding_dropout_p
         self.n_layers = n_layers
+    
+    def __str__(self):
+        lines = [
+            "╔" + "═" * 42 + "╗",
+            "║ Sepsis Predictor Encoder Hyperparameters ║",
+            "╠" + "═" * 42 + "╣",
+            f"  Embedding Dimension:      {self.embedding_dim}",
+            f"  Feedforward Hidden Dim:   {self.feedforward_hidden_dim}",
+            f"  Number of Attention Heads:{self.n_heads}",
+            f"  Activation Function:      {self.activation}",
+            f"  Number of Layers:         {self.n_layers}",
+            f"  Dropout Probability:      {self.dropout_p}",
+            f"  Pos. Encoding Dropout:    {self.pos_encoding_dropout_p}",
+            "╚" + "═" * 42 + "╝",
+        ]
+
+        # To tab align numbers so they appear in a neat column,
+        # we can reformat the lines so that all texts before colon
+        # are of the same width, and after colon we have uniform spacing.
+        # Instead of mixing it inline, let's format with fixed width for the label:
+        max_label_width = max(len(line.split(":")[0]) for line in lines[3:-1])
+        formatted_lines = lines[:3]  # keep header bars and title
+
+        for line in lines[3:-1]:
+            label, value = line.split(":")
+            # pad label to max width and add a consistent gap of 3 spaces after colon
+            formatted_lines.append(f"{label.ljust(max_label_width)} :   {value.strip()}")
+
+        formatted_lines.append(lines[-1])  # add bottom bar
+
+        return "\n".join(formatted_lines)
 
 
 # Shamelessly stolen straight from pytorch's docs

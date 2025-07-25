@@ -41,6 +41,28 @@ class Train_Hyperparameters:
         self.batch_size = batch_size
         self.num_epochs = num_epochs
         self.learning_rate = learning_rate
+        
+    def __str__(self):
+        lines = [
+            "╔" + "═" * 30 + "╗",
+            "║        Train Hyperparameters        ║",
+            "╠" + "═" * 30 + "╣",
+            f"  Batch Size      : {self.batch_size}",
+            f"  Number of Epochs: {self.num_epochs}",
+            f"  Learning Rate   : {self.learning_rate}",
+            "╚" + "═" * 30 + "╝",
+        ]
+
+        max_label_width = max(len(line.split(":")[0]) for line in lines[3:-1])
+        formatted_lines = lines[:3]
+
+        for line in lines[3:-1]:
+            label, value = line.split(":")
+            formatted_lines.append(f"{label.ljust(max_label_width)} :   {value.strip()}")
+
+        formatted_lines.append(lines[-1])
+        return "\n".join(formatted_lines)
+
 
 
 class Train_Hyperparameter_Grid:
