@@ -88,9 +88,10 @@ class Dense_Interpolator(nn.Module):
         self.I = interpolation_coeff
 
     def forward(self, x):
+        device = x.device
         _, L, _ = x.shape
-        i_idx = torch.arange(1, self.I + 1).float()  # (I)
-        l_idx = torch.arange(1, L + 1).float()  # (L)
+        i_idx = torch.arange(1, self.I + 1, device=device).float()  # (I)
+        l_idx = torch.arange(1, L + 1, device=device).float()  # (L)
         fractional_positions = i_idx.unsqueeze(1) * l_idx.unsqueeze(0) / L  # (I, L)
         coef = (
             1 - torch.abs(fractional_positions - i_idx.unsqueeze(1)) / self.I
