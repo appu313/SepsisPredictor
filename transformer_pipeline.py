@@ -7,7 +7,6 @@ import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
 import argparse
-from tqdm import tqdm
 from sklearn.metrics import roc_auc_score, roc_curve
 from torch.utils.data import Dataset, DataLoader
 from Model_Definitions import Sepsis_Predictor_Encoder, Sepsis_Predictor_Encoder_Hyperparameters
@@ -121,8 +120,8 @@ def main():
     os.makedirs(fig_dir, exist_ok=True)
     
     hyperparams = Sepsis_Predictor_Encoder_Hyperparameters(
-        embedding_dim=128,
-        feedforward_hidden_dim=256,
+        embedding_dim=48,
+        feedforward_hidden_dim=64,
         n_heads=4,
         activation='relu',
         n_layers=6,
