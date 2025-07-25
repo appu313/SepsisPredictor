@@ -115,23 +115,12 @@ class Sepsis_Predictor_Encoder(nn.Module):
             activation=self.activation_type,
             batch_first=True,
         )
-        
-        self.decoder_layer = nn.TransformerDecoderLayer(
-            d_model=self.embedding_dim,
-            nhead=self.n_heads,
-            dim_feedforward=self.feedforward_hidden_dim,
-            dropout=self.dropout_p,
-            activation=self.activation_type,
-            batch_first=True
-        )
-        
+
         self.encoder = nn.TransformerEncoder(
             encoder_layer=self.encoder_layer, num_layers=self.n_layers
         )
         
-        self.decoder = nn.TransformerDecoder(
-            decoder_layer=self.decoder_layer, num_layers=self.n_layers
-        )
+        self.norm = nn.LayerNorm(self.embedding_dim)
         
         self.classifier = nn.Linear(self.embedding_dim, output_size)
 
@@ -143,11 +132,14 @@ class Sepsis_Predictor_Encoder(nn.Module):
         """
         N, _, _ = x.shape
         device = x.device
-        embeddings = self.embedding_conv(torch.transpose(x, 1, 2))
-        embeddings = torch.transpose(embeddings, 1, 2)
-        pos_encodings = self.pos_encoding(x)
-        pos_encoded_embeddings = embeddings + pos_encodings
-        encoder_output = self.encoder(pos_encoded_embeddings)  # N, L, D
-        tgt = torch.zeros(size=(N, 1, self.embedding_dim), device=device)
-        decoder_output = self.decoder(tgt=tgt, memory=encoder_output)
-        return self.classifier(decoder_output[:, -1, :])
+        in_emb = self.embedding_conv(torch.transpose(x, 1, 2))
+        in_emb = torch.transpose(in_emb, 1, 2)
+        pos_enc = self.pos_encoding(x)
+        embeddings = in_emb + pos_enc
+        encoder_output = self.encoder(embeddings)  # N, L, D
+        encoder_output = self.norm(encoder_output)
+        
+        # Aggregate sequence
+        encoder_output = encoder_output.mean(dim=1) # N, D
+        
+        return self.classifier(encoder_output)
