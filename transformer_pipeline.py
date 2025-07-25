@@ -49,7 +49,7 @@ class SepsisTransformerResult:
 
         # Determine the max width of labels before the colon for alignment
         # Skip the note line as it doesn't have a colon for splitting
-        label_lines = [line for line in lines[4:-1]]
+        label_lines = [line for line in lines[3:-1]]
         max_label_width = max(len(line.split(":")[0]) for line in label_lines)
 
         formatted_lines = lines[:4]  # include header and note
@@ -91,7 +91,7 @@ def plot_roc_curve(fpr, tpr, auc, split_name, out_dir):
     plt.savefig(os.path.join(out_dir, 'roc_curve.png')); plt.close()
 
 def plot_prc_curve(prec, rec, auprc, split_name, out_dir):
-    plt.figure(); plt.plot(prec, rec, label=f'AUC={auprc:.3f}'); plt.plot([0,1],[0,1],'--')
+    plt.figure(); plt.plot(prec, rec, label=f'AUC={auprc:.3f}')
     plt.xlabel('Precision'); plt.ylabel('Recall'); plt.title(f'PRC ({split_name})'); plt.legend()
     plt.savefig(os.path.join(out_dir, 'prc_curve.png')); plt.close()
 
@@ -212,7 +212,7 @@ def main():
         feedforward_hidden_dim=128,
         n_heads=4,
         activation='relu',
-        n_layers=8,
+        n_layers=6,
         dropout_p=0,
         pos_encoding_dropout_p=0
     )
@@ -234,7 +234,7 @@ def main():
     print(f'\n\n')
     print(f'------ Starting Training: Split {args.split_name} ------\n')
     
-    print(f'{hyperparams}\n{train_params}')
+    print(f'{hyperparams}\n{train_params}\n')
     
     loss_grid, roc_grid, prc_grid, best_thresh_scores, confusion_matrix, auroc, auprc = train_eval_transformer(model, criterion, train_ds, test_ds, train_params)
     
