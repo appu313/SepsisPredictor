@@ -105,7 +105,7 @@ def plot_roc_and_prc_curves(roc_curve, prc_curve, split_name, out_dir):
 
 def plot_confusion_matrix(cm, split_name, out_dir):
     fig, ax = plt.subplots(figsize=(6, 6))
-    cm_display = ConfusionMatrixDisplay(cm, display_labels=[0, 1])
+    cm_display = ConfusionMatrixDisplay(cm)
     cm_display.plot(ax)
     fig.suptitle(f'Confusion Matrix -- Split {split_name}')
     plt.savefig(os.path.join(out_dir, 'cmatrix.png'))
@@ -235,7 +235,7 @@ def main():
     )
     
     train_params = Train_Hyperparameters(
-        batch_size=32,
+        batch_size=16,
         num_epochs=10,
         learning_rate=1e-4
     )
