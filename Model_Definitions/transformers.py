@@ -77,30 +77,30 @@ class PositionalEncoding(nn.Module):
 
 
 # Inspired by : https://arxiv.org/pdf/2203.14469v1
-class Dense_Interpolator(nn.Module):
-    """Dense Interpolation Module
+# class Dense_Interpolator(nn.Module):
+#     """Dense Interpolation Module
 
-    Implements dense interpolation algorithm from (Wang, Zhao, et al)
-    """
+#     Implements dense interpolation algorithm from (Wang, Zhao, et al)
+#     """
 
-    def __init__(self, interpolation_coeff):
-        super(Dense_Interpolator, self).__init__()
-        self.I = interpolation_coeff
+#     def __init__(self, interpolation_coeff):
+#         super(Dense_Interpolator, self).__init__()
+#         self.I = interpolation_coeff
 
-    def forward(self, x):
-        device = x.device
-        _, L, _ = x.shape
-        i_idx = torch.arange(1, self.I + 1, device=device).float()  # (I)
-        l_idx = torch.arange(1, L + 1, device=device).float()  # (L)
-        fractional_positions = i_idx.unsqueeze(1) * l_idx.unsqueeze(0) / L  # (I, L)
-        coef = (
-            1 - torch.abs(fractional_positions - i_idx.unsqueeze(1)) / self.I
-        ) ** 2  # (I, L)
-        coef = coef.unsqueeze(0).unsqueeze(3)  # (1, I, L, 1)
-        x_expanded = x.unsqueeze(1)  # (N, 1, L, D)
-        weighted = coef * x_expanded
-        z = weighted.sum(dim=2)  # (N, I, D)
-        return z
+#     def forward(self, x):
+#         device = x.device
+#         _, L, _ = x.shape
+#         i_idx = torch.arange(1, self.I + 1, device=device).float()  # (I)
+#         l_idx = torch.arange(1, L + 1, device=device).float()  # (L)
+#         fractional_positions = i_idx.unsqueeze(1) * l_idx.unsqueeze(0) / L  # (I, L)
+#         coef = (
+#             1 - torch.abs(fractional_positions - i_idx.unsqueeze(1)) / self.I
+#         ) ** 2  # (I, L)
+#         coef = coef.unsqueeze(0).unsqueeze(3)  # (1, I, L, 1)
+#         x_expanded = x.unsqueeze(1)  # (N, 1, L, D)
+#         weighted = coef * x_expanded
+#         z = weighted.sum(dim=2)  # (N, I, D)
+#         return z
 
 
 # Inspired by : https://arxiv.org/pdf/2203.14469v1
@@ -145,22 +145,20 @@ class Sepsis_Predictor_Encoder(nn.Module):
             activation=self.activation_type,
             batch_first=True,
         )
+        
+        self.decoder_layer = nn.TransformerDecoderLayer(
+            d_model=self.embedding_dim,
+            nhead=self.n_heads,
+            dim_feedforward=self.feedforward_hidden_dim,
+            dropout=self.dropout_p,
+            activation=self.activation_type,
+            batch_first=True
+        )
+        
         self.encoder = nn.TransformerEncoder(
             encoder_layer=self.encoder_layer, num_layers=self.n_layers
         )
-        self.interpolator = Dense_Interpolator(
-            interpolation_coeff=self.interpolation_coeff
-        )
-        self.feedforward_classifier = nn.Sequential(
-            nn.Linear(
-                self.interpolation_coeff * self.embedding_dim, self.embedding_dim
-            ),
-            nn.ReLU() if self.activation_type == "relu" else nn.GELU(),
-            nn.Linear(self.embedding_dim, output_size),
-        )
-        self.feedforward = nn.Linear(
-            self.interpolation_coeff * self.embedding_dim, self.embedding_dim
-        )
+        
         self.classifier = nn.Linear(self.embedding_dim, output_size)
 
     def forward(self, x):
@@ -169,11 +167,13 @@ class Sepsis_Predictor_Encoder(nn.Module):
         Args:
             x (Tensor): Input batch of sequences with shape (Batch Size, Seq Len, Input Dim)
         """
+        N, L, D = x.shape
+        device = x.device
         embeddings = self.embedding_conv(torch.transpose(x, 1, 2))
         embeddings = torch.transpose(embeddings, 1, 2)
         pos_encodings = self.pos_encoding(x)
         pos_encoded_embeddings = embeddings + pos_encodings
         encoder_output = self.encoder(pos_encoded_embeddings)  # N, L, D
-        dense_rep = self.interpolator(encoder_output)
-        dense_rep = dense_rep.reshape(-1, self.interpolation_coeff * self.embedding_dim)
-        return self.feedforward_classifier(dense_rep)
+        tgt = torch.zeros(size=(N, 1, D), device=device)
+        decoder_output = self.decoder_layer(tgt=tgt, memory=encoder_output, tgt_is_causal=True)
+        return self.classifier(decoder_output[:, -1, :])
