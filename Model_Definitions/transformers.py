@@ -15,7 +15,6 @@ class Sepsis_Predictor_Encoder_Hyperparameters:
         n_layers: int = 1,
         dropout_p: float = 0.0,
         pos_encoding_dropout_p: float = 0.0,
-        interpolation_coeff: int = 24,
     ):
         """_summary_
 
@@ -40,7 +39,6 @@ class Sepsis_Predictor_Encoder_Hyperparameters:
         self.dropout_p = dropout_p
         self.pos_encoding_dropout_p = pos_encoding_dropout_p
         self.n_layers = n_layers
-        self.interpolation_coeff = interpolation_coeff
 
 
 # Shamelessly stolen straight from pytorch's docs
