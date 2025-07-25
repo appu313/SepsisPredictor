@@ -97,7 +97,7 @@ def plot_roc_and_prc_curves(roc_curve, prc_curve, split_name, out_dir):
     roc_display = RocCurveDisplay(fpr=fpr, tpr=tpr)
     prc_display = PrecisionRecallDisplay(precision=prec, recall=rec)
     roc_display.plot(ax=ax1)
-    prc_display.pllt(ax=ax2)
+    prc_display.plot(ax=ax2)
     
     fig.suptitle(f'ROC, Precision/Recall -- Split {split_name}')
     
