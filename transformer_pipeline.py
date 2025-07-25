@@ -7,10 +7,61 @@ import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
 import argparse
-from sklearn.metrics import roc_auc_score, roc_curve
+from sklearn.metrics import(
+    roc_curve, 
+    precision_recall_curve, 
+    roc_auc_score, 
+    average_precision_score,
+    f1_score,
+    confusion_matrix
+)
 from torch.utils.data import Dataset, DataLoader
 from Model_Definitions import Sepsis_Predictor_Encoder, Sepsis_Predictor_Encoder_Hyperparameters
 from Training_Pipeline import Train_Hyperparameters
+
+class SepsisTransformerResult:
+    def __init__(self, best_thresh, f1, precision, recall, confusion_matrix, auroc, auprc):
+        self.best_threshold = best_thresh
+        self.f1_score = f1
+        self.precision = precision
+        self.recall = recall
+        self.tn, self.fp, self.fn, self.tp = confusion_matrix
+        self.auroc = auroc
+        self.auprc = auprc
+
+    def __str__(self):
+        lines = [
+            "╔" + "═" * 46 + "╗",
+            "║          Sepsis Transformer Results          ║",
+            "╠" + "═" * 46 + "╣",
+            f"  Best Threshold (max F1) : {self.best_threshold}",
+            f"  F1 Score                : {self.f1_score}",
+            f"  Precision (at max F1)   : {self.precision}",
+            f"  Recall (at max F1)      : {self.recall}",
+            f"  TN (at max F1)          : {self.tn}",
+            f"  FP (at max F1)          : {self.fp}",
+            f"  FN (at max F1)          : {self.fn}",
+            f"  TP (at max F1)          : {self.tp}",
+            f"  AUROC                   : {self.auroc}",
+            f"  AUPRC                   : {self.auprc}",
+            "╚" + "═" * 46 + "╝",
+        ]
+
+        # Determine the max width of labels before the colon for alignment
+        # Skip the note line as it doesn't have a colon for splitting
+        label_lines = [line for line in lines[4:-1]]
+        max_label_width = max(len(line.split(":")[0]) for line in label_lines)
+
+        formatted_lines = lines[:4]  # include header and note
+
+        for line in label_lines:
+            label, value = line.split(":")
+            formatted_lines.append(f"{label.ljust(max_label_width)} :   {value.strip()}")
+
+        formatted_lines.append(lines[-1])  # bottom bar
+
+        return "\n".join(formatted_lines)
+
 
 class SepsisTransformerDataset(Dataset):
     def __init__(self, npz_dir, labels_csv):
@@ -38,6 +89,11 @@ def plot_roc_curve(fpr, tpr, auc, split_name, out_dir):
     plt.figure(); plt.plot(fpr, tpr, label=f'AUC={auc:.3f}'); plt.plot([0,1],[0,1],'--')
     plt.xlabel('FPR'); plt.ylabel('TPR'); plt.title(f'ROC ({split_name})'); plt.legend()
     plt.savefig(os.path.join(out_dir, 'roc_curve.png')); plt.close()
+
+def plot_prc_curve(prec, rec, auprc, split_name, out_dir):
+    plt.figure(); plt.plot(prec, rec, label=f'AUC={auprc:.3f}'); plt.plot([0,1],[0,1],'--')
+    plt.xlabel('Precision'); plt.ylabel('Recall'); plt.title(f'PRC ({split_name})'); plt.legend()
+    plt.savefig(os.path.join(out_dir, 'prc_curve.png')); plt.close()
 
 def train_eval_transformer(
     model,
@@ -82,14 +138,46 @@ def train_eval_transformer(
         eval_losses.append(total_eval / len(eval_loader.dataset))
         labels = np.concatenate(all_labels)
         preds = np.concatenate(all_preds)
-        auc = roc_auc_score(labels, preds)
+        auroc = roc_auc_score(labels, preds)
         print(f"Epoch {epoch:2d} | train loss {train_losses[-1]:.4f}"
-                f" | val loss {eval_losses[-1]:.4f} | val AUROC {auc:.4f}")
+                f" | val loss {eval_losses[-1]:.4f} | val AUROC {auroc:.4f}")
         
     # save plots
     epochs_range = [e for e in range(1, train_params.num_epochs + 1)]
     fpr, tpr, _ = roc_curve(labels, preds)
-    return (epochs_range, train_losses, eval_losses), (fpr, tpr), auc
+    prec, rec, pr_thresholds = precision_recall_curve(labels, preds)
+    auroc = roc_auc_score(labels, preds)
+    auprc = average_precision_score(labels, preds)
+    
+    # f1 score for each threshold
+    f1s = []
+    for thresh in pr_thresholds:
+        y_pred = (preds >= thresh).astype(int)
+        f1s.append(f1_score(labels, y_pred))
+    f1s = np.array(f1s)
+    
+    # best threshold (max f1)
+    best_idx = f1s.argmax()
+    best_threshold = pr_thresholds[best_idx]
+    best_f1 = f1s[best_idx]
+    precision = prec[best_idx]
+    recall = rec[best_idx]
+    y_pred_best = (preds >= best_threshold).astype(int)
+    
+    # confusion matrix
+    tn, fp, fn, tp = confusion_matrix(labels, y_pred_best).ravel()
+    
+    
+    
+    return (
+        (epochs_range, train_losses, eval_losses), 
+        (fpr, tpr), 
+        (prec, rec),
+        (best_threshold, best_f1, precision, recall),
+        (tn, fp, fn, tp),
+        auroc,
+        auprc
+    )
 
 def main():
     parser = argparse.ArgumentParser()
@@ -124,14 +212,14 @@ def main():
         feedforward_hidden_dim=128,
         n_heads=4,
         activation='relu',
-        n_layers=6,
+        n_layers=8,
         dropout_p=0,
         pos_encoding_dropout_p=0
     )
     
     train_params = Train_Hyperparameters(
         batch_size=16,
-        num_epochs=15,
+        num_epochs=10,
         learning_rate=1e-4
     )
     
@@ -148,15 +236,28 @@ def main():
     
     print(f'{hyperparams}\n{train_params}')
     
-    loss_grid, roc_grid, auroc = train_eval_transformer(model, criterion, train_ds, test_ds, train_params)
+    loss_grid, roc_grid, prc_grid, best_thresh_scores, confusion_matrix, auroc, auprc = train_eval_transformer(model, criterion, train_ds, test_ds, train_params)
     
     epochs, train_loss, eval_loss = loss_grid
     fpr, tpr = roc_grid
+    prec, rec = prc_grid
+    threshold, f1, precision, recall = best_thresh_scores
+    
+    res = SepsisTransformerResult(
+        best_thresh=threshold,
+        f1=f1,
+        precision=precision,
+        recall=recall,
+        confusion_matrix=confusion_matrix,
+        auroc=auroc,
+        auprc=auprc
+    )
+    
+    print(f'\n{res}\n')
     
     plot_loss_curve(epochs, train_loss, eval_loss, split_name=args.split_name, out_dir=fig_dir)
     plot_roc_curve(fpr, tpr, auroc, args.split_name, fig_dir)
-    
-    
+    plot_prc_curve(prec, rec, auprc, args.split_name, fig_dir)
 
 if __name__ == '__main__':
     main()
