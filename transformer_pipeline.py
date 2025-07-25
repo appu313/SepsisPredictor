@@ -126,8 +126,8 @@ def main():
         n_heads=8,
         activation='gelu',
         n_layers=24,
-        dropout_p=0,
-        pos_encoding_dropout_p=0
+        dropout_p=0.1,
+        pos_encoding_dropout_p=0.1
     )
     
     train_params = Train_Hyperparameters(
