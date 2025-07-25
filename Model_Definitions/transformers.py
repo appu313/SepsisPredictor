@@ -167,13 +167,13 @@ class Sepsis_Predictor_Encoder(nn.Module):
         Args:
             x (Tensor): Input batch of sequences with shape (Batch Size, Seq Len, Input Dim)
         """
-        N, L, D = x.shape
+        N, _, _ = x.shape
         device = x.device
         embeddings = self.embedding_conv(torch.transpose(x, 1, 2))
         embeddings = torch.transpose(embeddings, 1, 2)
         pos_encodings = self.pos_encoding(x)
         pos_encoded_embeddings = embeddings + pos_encodings
         encoder_output = self.encoder(pos_encoded_embeddings)  # N, L, D
-        tgt = torch.zeros(size=(N, 1, D), device=device)
+        tgt = torch.zeros(size=(N, 1, self.embedding_dim), device=device)
         decoder_output = self.decoder_layer(tgt=tgt, memory=encoder_output)
         return self.classifier(decoder_output[:, -1, :])
