@@ -133,7 +133,7 @@ def main():
     
     train_params = Train_Hyperparameters(
         batch_size=32,
-        num_epochs=40,
+        num_epochs=5,
         learning_rate=1e-3
     )
     
