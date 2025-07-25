@@ -106,7 +106,7 @@ def plot_roc_and_prc_curves(roc_curve, prc_curve, split_name, out_dir):
 def plot_confusion_matrix(cm, split_name, out_dir):
     fig, ax = plt.subplots(figsize=(6, 6))
     cm_display = ConfusionMatrixDisplay(cm)
-    cm_display.plot(ax)
+    cm_display.plot(ax=ax)
     ax.set_title(f'Confusion Matrix -- Split {split_name}')
     plt.savefig(os.path.join(out_dir, 'cmatrix.png'))
     plt.close(fig)
