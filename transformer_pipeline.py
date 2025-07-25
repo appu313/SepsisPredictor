@@ -52,7 +52,7 @@ def train_eval_transformer(
     optimizer = torch.optim.Adam(model.parameters(), train_params.learning_rate)
     
     train_loader = DataLoader(train_set, batch_size=train_params.batch_size, shuffle=True)
-    eval_loader = DataLoader(eval_set, batch_size=train_params.batch_size, shuffle=True)
+    eval_loader = DataLoader(eval_set, batch_size=train_params.batch_size, shuffle=False)
     
     train_losses, eval_losses = [], []
     for epoch in range(1, train_params.num_epochs + 1):
