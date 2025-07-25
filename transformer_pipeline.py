@@ -125,14 +125,14 @@ def main():
         feedforward_hidden_dim=256,
         n_heads=8,
         activation='gelu',
-        n_layers=4,
+        n_layers=24,
         dropout_p=0,
         pos_encoding_dropout_p=0
     )
     
     train_params = Train_Hyperparameters(
         batch_size=32,
-        num_epochs=100,
+        num_epochs=20,
         learning_rate=1e-4
     )
     
