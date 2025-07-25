@@ -194,7 +194,8 @@ def train_eval_transformer(
         auprc
     )
 
-def main():
+
+if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('data_dir', type=str, help='Parent directory of transformer inputs, containing splits')
     parser.add_argument('output_dir', type=str, help='Where to store results')
@@ -270,6 +271,3 @@ def main():
     plot_loss_curve(epochs, train_loss, eval_loss, split_name=args.split_name, out_dir=fig_dir)
     plot_roc_and_prc_curves(roc_curve=roc_grid, prc_curve=prc_grid, split_name=args.split_name, out_dir=fig_dir)
     plot_confusion_matrix(cm=confusion_matrix, split_name=args.split_name, out_dir=fig_dir)
-
-if __name__ == '__main__':
-    main()

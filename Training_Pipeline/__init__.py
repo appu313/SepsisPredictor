@@ -22,4 +22,12 @@ from .train import (
 )
 from .tune import grid_search_tune, grid_search_tune_parallel, Hyperparameter_Grid
 from .evaluate import roc_eval
+from .transformer_pipeline import(
+    SepsisTransformerResult, 
+    train_eval_transformer, 
+    SepsisTransformerDataset,
+    plot_loss_curve,
+    plot_confusion_matrix,
+    plot_roc_and_prc_curves
+)
 
