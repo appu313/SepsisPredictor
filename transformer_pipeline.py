@@ -132,7 +132,7 @@ def main():
     train_params = Train_Hyperparameters(
         batch_size=16,
         num_epochs=30,
-        learning_rate=1e-4
+        learning_rate=5e-5
     )
     
     model = Sepsis_Predictor_Encoder(
