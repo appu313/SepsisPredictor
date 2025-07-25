@@ -13,3 +13,6 @@ data/**/*
 
 # Ignore ibynb checkpoints
 .ipynb_checkpoints/**/*
+
+# Ignore slurm batch job scripts
+*.sbatch
