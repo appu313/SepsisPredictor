@@ -125,14 +125,14 @@ def main():
         n_heads=4,
         activation='relu',
         n_layers=6,
-        dropout_p=0.1,
-        pos_encoding_dropout_p=0.1
+        dropout_p=0,
+        pos_encoding_dropout_p=0
     )
     
     train_params = Train_Hyperparameters(
         batch_size=16,
-        num_epochs=10,
-        learning_rate=1e-3
+        num_epochs=15,
+        learning_rate=1e-4
     )
     
     model = Sepsis_Predictor_Encoder(
