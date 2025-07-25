@@ -175,5 +175,5 @@ class Sepsis_Predictor_Encoder(nn.Module):
         pos_encoded_embeddings = embeddings + pos_encodings
         encoder_output = self.encoder(pos_encoded_embeddings)  # N, L, D
         tgt = torch.zeros(size=(N, 1, D), device=device)
-        decoder_output = self.decoder_layer(tgt=tgt, memory=encoder_output, tgt_is_causal=True)
+        decoder_output = self.decoder_layer(tgt=tgt, memory=encoder_output)
         return self.classifier(decoder_output[:, -1, :])
