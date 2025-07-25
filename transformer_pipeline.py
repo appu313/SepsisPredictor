@@ -23,7 +23,7 @@ class SepsisTransformerDataset(Dataset):
         return len(self.files)
 
     def __getitem__(self, idx):
-        data = np.load(self.files[idx])
+        data = np.load(self.files[idx], allow_pickle=True)
         X = torch.from_numpy(data['X']).float()
         pid = int(os.path.basename(self.files[idx]).split('_')[1].split('.')[0])
         y = torch.tensor(self.labels[pid], dtype=torch.float32)
