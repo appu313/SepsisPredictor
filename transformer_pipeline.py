@@ -63,7 +63,7 @@ def train_eval_transformer(
             X, y = [t.to(device) for t in (X, y)]
             optimizer.zero_grad()
             out = model(X)
-            loss = criterion(out, y)
+            loss = criterion(out.squeeze(), y)
             loss.backward()
             optimizer.step()
             total_tr += loss.item() * X.size(0)
@@ -76,7 +76,7 @@ def train_eval_transformer(
             for X, y in eval_loader:
                 X, y = [t.to(device) for t in (X, y)]
                 out = model(X)
-                total_eval += criterion(out, y).item() * X.size(0)
+                total_eval += criterion(out.squeeze(), y).item() * X.size(0)
                 preds = torch.sigmoid(out).cpu().numpy()
                 all_preds.append(preds)
                 all_labels.append(y.cpu().numpy())
